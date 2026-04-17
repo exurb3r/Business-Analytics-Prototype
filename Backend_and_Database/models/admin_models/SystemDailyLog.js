@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const { emit } = require('./Admins');
 const Schema = mongoose.Schema;
 
 const systemDailyLogschema = new Schema({

@@ -38,6 +38,22 @@ const addPaySubschema = new Schema({
     overtimePay: {
         type: Number
     }, // amount to be added for overtime
+    overtimeRegHolidayHours: {
+        type: Number
+    }, // number of overtime hours on regular holidays
+    overtimeRegHolidayPay: {
+        type: Number
+    }, // amount to be added for overtime on regular holidays
+
+    overtimeHoursSpecialHoliday: {
+        type: Number
+    }, // number of overtime hours on special holidays
+    overtimeSpecialHolidayPay: {
+        type: Number
+    }, // amount to be added for overtime on special holidays
+
+
+
     regularHoliday: {
         type: Number
     }, // amount to be added for regular holidays
@@ -121,6 +137,10 @@ const employeePayrollLogSchema = new Schema({
     _id: {
         type: Schema.Types.ObjectId,
         ref: 'Employees',   
+    },
+    email: {
+        type: String,
+        required: true
     },
     employeePayrollLog : [employeeDailyLogSubschema]
 });

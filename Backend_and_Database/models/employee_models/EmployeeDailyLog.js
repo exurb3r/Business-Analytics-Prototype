@@ -24,13 +24,13 @@ const employeeDailyLogSubschema = new Schema({
         required: true
     },
     latetime: {
-        type: Boolean, // or number of minutes late
+        type: Number, // or number of minutes late
     },
     undertime: {
-        type: Boolean, // or number of  minutes or hours
+        type: Number, // or number of  minutes or hours
     },
     overtime: {
-        type: Boolean, //or number of hours
+        type: Number, //or number of hours
     },
     absent: {
         type: Boolean,
@@ -57,6 +57,10 @@ const employeeDailyLogSubschema = new Schema({
 });
 
 const employeeDailyLogSchema = new Schema({
+    email: {
+        type: String,
+        required: true
+    },
     employeeDailyLog: [employeeDailyLogSubschema]
 });
 

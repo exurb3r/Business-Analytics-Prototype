@@ -9,9 +9,8 @@ const password = ref("")
 const error = ref("")
 const loading = ref(false)
 
-
 onMounted(() => {
-  const token = localStorage.getItem("adminToken")
+  const token = localStorage.getItem("employeeToken")
   if (token) {
     router.push("/dashboard")
   }
@@ -22,7 +21,7 @@ const handleLogin = async () => {
   loading.value = true
 
   try {
-    const response = await fetch("http://localhost:3500/admins/auth/login", {
+    const response = await fetch("http://localhost:3500/employees/auth/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -41,8 +40,8 @@ const handleLogin = async () => {
       return
     }
 
-    localStorage.setItem("adminToken", data.token)
-    localStorage.setItem("adminCredentials", JSON.stringify(data.user))
+    localStorage.setItem("employeeToken", data.token)
+    localStorage.setItem("employeeCredentials", JSON.stringify(data.user))
 
     router.push("/dashboard")
 
@@ -61,15 +60,15 @@ const handleLogin = async () => {
     <!-- LEFT PANEL -->
     <div class="left-panel">
       <div class="brand">
-        <h1>Armztrong Gym</h1>
-        <p>Admin Control Panel</p>
+        <h1>Employee Portal</h1>
+        <p>Staff Access System</p>
       </div>
 
       <div class="tagline">
-        <h2>Manage your gym with confidence</h2>
+        <h2>Welcome back, employee</h2>
         <p>
-          Access members, track performance, manage rewards,
-          and monitor activity — all in one place.
+          Log in to manage your tasks, track attendance,
+          and access your work dashboard securely.
         </p>
       </div>
     </div>
@@ -78,7 +77,7 @@ const handleLogin = async () => {
     <div class="right-panel">
       <div class="login-card">
 
-        <h2>Admin Login</h2>
+        <h2>Employee Login</h2>
         <p class="subtitle">Sign in to continue</p>
 
         <form @submit.prevent="handleLogin">
@@ -115,7 +114,7 @@ const handleLogin = async () => {
         </form>
 
         <div class="footer-note">
-          Secure admin access only
+          Secure employee access only
         </div>
 
       </div>
@@ -133,23 +132,23 @@ const handleLogin = async () => {
 
 .left-panel {
   flex: 1;
-  background: linear-gradient(135deg, #0C0C0C, #1a1a1a);
+  background: linear-gradient(135deg, #0a192f, #112240);
   color: white;
   display: flex;
   flex-direction: column;
   justify-content: center;
   padding: 60px;
-  border-right: 1px solid #2a2a2a;
+  border-right: 1px solid #1e3a5f;
 }
 
 .brand h1 {
-  color: #F2613F;
+  color: #3b82f6;
   font-size: 28px;
   margin-bottom: 5px;
 }
 
 .brand p {
-  color: #888;
+  color: #9ca3af;
   font-size: 14px;
 }
 
@@ -164,7 +163,7 @@ const handleLogin = async () => {
 }
 
 .tagline p {
-  color: #aaa;
+  color: #cbd5e1;
   line-height: 1.6;
 }
 
@@ -173,25 +172,25 @@ const handleLogin = async () => {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: #0C0C0C;
+  background: #0a192f;
 }
 
 .login-card {
   width: 360px;
   padding: 35px;
   border-radius: 16px;
-  background: #1a1a1a;
-  border: 1px solid #481E14;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  background: #112240;
+  border: 1px solid #1e3a5f;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.6);
 }
 
 h2 {
-  color: #F2613F;
+  color: #3b82f6;
   margin-bottom: 5px;
 }
 
 .subtitle {
-  color: #888;
+  color: #9ca3af;
   font-size: 13px;
   margin-bottom: 20px;
 }
@@ -203,7 +202,7 @@ h2 {
 label {
   display: block;
   font-size: 12px;
-  color: #aaa;
+  color: #cbd5e1;
   margin-bottom: 6px;
 }
 
@@ -211,16 +210,16 @@ input {
   width: 100%;
   padding: 11px;
   border-radius: 8px;
-  border: 1px solid #2a2a2a;
-  background: #0C0C0C;
+  border: 1px solid #1e3a5f;
+  background: #0a192f;
   color: white;
   outline: none;
   transition: 0.2s;
 }
 
 input:focus {
-  border-color: #F2613F;
-  box-shadow: 0 0 0 2px rgba(242,97,63,0.2);
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59,130,246,0.2);
 }
 
 button {
@@ -229,7 +228,7 @@ button {
   margin-top: 10px;
   border: none;
   border-radius: 8px;
-  background: linear-gradient(135deg, #F2613F, #9B3922);
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
   color: white;
   font-weight: bold;
   cursor: pointer;
@@ -258,7 +257,7 @@ button:disabled {
 .footer-note {
   margin-top: 15px;
   font-size: 11px;
-  color: #666;
+  color: #64748b;
   text-align: center;
 }
 </style>

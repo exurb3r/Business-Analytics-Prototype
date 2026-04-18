@@ -1,131 +1,185 @@
 <script setup>
 import { useRoute } from "vue-router";
+import { ref, onMounted } from "vue";
 
 const route = useRoute();
+const token = localStorage.getItem("adminToken");
 
+// ✅ EMPLOYEE
 const emp = {
-  id: route.params.id,
+  email: route.params.email,
   name: route.query.name,
   rate: Number(route.query.rate)
 };
 
-const payroll = {
-  month:"April 2026",
-  basic: emp.rate || 0,
+// ✅ FORMAT FUNCTION (🔥 MAIN FIX)
+const formatMoney = (value) => {
+  return Number(value || 0).toLocaleString("en-PH", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
+};
 
-  less:{
-    late:500,
-    undertime:300,
-    absent:1000,
-    damages:200,
-    advancements:1500
-  },
+// ✅ STATE
+const payroll = ref(null);
+const loading = ref(false);
+const error = ref("");
 
-  add:{
-    overtime:800,
-    holidayRegular:1200,
-    holidaySpecial:600,
-    nightDiff:400,
-    otHoliday:500
-  },
+// ✅ FETCH
+const fetchPayroll = async () => {
+  loading.value = true;
+  error.value = "";
 
-  deductions:{
-    sss:500,
-    hdmf:200,
-    philhealth:300,
-    tax:700
+  try {
+    const res = await fetch(
+      `http://localhost:3500/admins/getlistofpayrolls/payroll/${emp.email}/${route.query.month}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      error.value = data.message;
+      return;
+    }
+
+    payroll.value = data;
+
+  } catch (err) {
+    console.error(err);
+    error.value = "Server error";
+  } finally {
+    loading.value = false;
   }
 };
 
-const totalLess = Object.values(payroll.less).reduce((a,b)=>a+b,0);
-const totalAdd = Object.values(payroll.add).reduce((a,b)=>a+b,0);
-const afterLess = payroll.basic - totalLess;
-const afterAdd = afterLess + totalAdd;
-const gross = afterAdd;
-const totalDeduct = Object.values(payroll.deductions).reduce((a,b)=>a+b,0);
-const net = gross - totalDeduct;
+onMounted(fetchPayroll);
+
+// ✅ COMPUTATIONS
+const totalLess = () =>
+  payroll.value
+    ? payroll.value.lessPay.lateDeduction +
+      payroll.value.lessPay.undertimeDeduction +
+      payroll.value.lessPay.absentDeduction +
+      payroll.value.lessPay.damages +
+      payroll.value.lessPay.advancements
+    : 0;
+
+const totalAdd = () =>
+  payroll.value
+    ? payroll.value.addPay.overtimePay +
+      payroll.value.addPay.regularHolidayPay +
+      payroll.value.addPay.specialHolidayPay +
+      payroll.value.addPay.nightDifferentialPay +
+      payroll.value.addPay.otherAdditions
+    : 0;
+
+const afterLess = () =>
+  payroll.value ? payroll.value.basicPay - totalLess() : 0;
+
+const afterAdd = () =>
+  payroll.value ? afterLess() + totalAdd() : 0;
+
+const totalDeduct = () =>
+  payroll.value
+    ? payroll.value.mandatoryDeductions.sssContribution +
+      payroll.value.mandatoryDeductions.hdmfContribution +
+      payroll.value.mandatoryDeductions.philHealthContribution +
+      payroll.value.mandatoryDeductions.withholdingTax
+    : 0;
 </script>
 
 <template>
 <div class="employees-wrap">
 
-<div class="employees-header">
-<h2>{{ emp.name }}</h2>
-<p>{{ payroll.month }}</p>
-</div>
+  <div class="employees-header">
+    <h2>{{ emp.name }}</h2>
+    <p>{{ payroll?.month }}</p>
+  </div>
 
-<table class="payroll-table">
+  <div v-if="loading" class="empty">Loading...</div>
+  <div v-if="error" class="error">{{ error }}</div>
 
-<tbody>
+  <table v-if="payroll" class="payroll-table">
+    <tbody>
 
-<tr>
-<td class="left"><h3>Basic Pay</h3></td>
-<td class="middle"></td>
-<td class="right">₱{{ payroll.basic.toLocaleString() }}</td>
-</tr>
+      <!-- BASIC -->
+      <tr>
+        <td class="left"><h3>Basic Pay</h3></td>
+        <td></td>
+        <td class="right">₱{{ formatMoney(payroll.basicPay) }}</td>
+      </tr>
 
-<tr>
-<td class="left"><h3>Less</h3></td>
-<td class="middle">
-<div>Late — ₱{{ payroll.less.late }}</div>
-<div>Undertime — ₱{{ payroll.less.undertime }}</div>
-<div>Absent — ₱{{ payroll.less.absent }}</div>
-<div>Damages — ₱{{ payroll.less.damages }}</div>
-<div>Advancements — ₱{{ payroll.less.advancements }}</div>
-</td>
-<td class="right">₱{{ totalLess }}</td>
-</tr>
+      <!-- LESS -->
+      <tr>
+        <td class="left"><h3>Less</h3></td>
+        <td class="middle">
+          <div>Late — ₱{{ formatMoney(payroll.lessPay.lateDeduction) }}</div>
+          <div>Undertime — ₱{{ formatMoney(payroll.lessPay.undertimeDeduction) }}</div>
+          <div>Absent — ₱{{ formatMoney(payroll.lessPay.absentDeduction) }}</div>
+          <div>Damages — ₱{{ formatMoney(payroll.lessPay.damages) }}</div>
+          <div>Advancements — ₱{{ formatMoney(payroll.lessPay.advancements) }}</div>
+        </td>
+        <td class="right">₱{{ formatMoney(totalLess()) }}</td>
+      </tr>
 
-<tr class="subtotal">
-<td class="left">After Less</td>
-<td></td>
-<td class="right">₱{{ afterLess }}</td>
-</tr>
+      <tr class="subtotal">
+        <td>After Less</td>
+        <td></td>
+        <td class="right">₱{{ formatMoney(afterLess()) }}</td>
+      </tr>
 
-<tr>
-<td class="left"><h3>Add</h3></td>
-<td class="middle">
-<div>Overtime — ₱{{ payroll.add.overtime }}</div>
-<div>Holiday (Regular) — ₱{{ payroll.add.holidayRegular }}</div>
-<div>Holiday (Special) — ₱{{ payroll.add.holidaySpecial }}</div>
-<div>Night Differential — ₱{{ payroll.add.nightDiff }}</div>
-<div>OT Holiday — ₱{{ payroll.add.otHoliday }}</div>
-</td>
-<td class="right">₱{{ totalAdd }}</td>
-</tr>
+      <!-- ADD -->
+      <tr>
+        <td class="left"><h3>Add</h3></td>
+        <td class="middle">
+          <div>Overtime — ₱{{ formatMoney(payroll.addPay.overtimePay) }}</div>
+          <div>Holiday (Regular) — ₱{{ formatMoney(payroll.addPay.regularHolidayPay) }}</div>
+          <div>Holiday (Special) — ₱{{ formatMoney(payroll.addPay.specialHolidayPay) }}</div>
+          <div>Night Differential — ₱{{ formatMoney(payroll.addPay.nightDifferentialPay) }}</div>
+          <div>Other Additions — ₱{{ formatMoney(payroll.addPay.otherAdditions) }}</div>
+        </td>
+        <td class="right">₱{{ formatMoney(totalAdd()) }}</td>
+      </tr>
 
-<tr class="subtotal">
-<td class="left">After Add</td>
-<td></td>
-<td class="right">₱{{ afterAdd }}</td>
-</tr>
+      <tr class="subtotal">
+        <td>After Add</td>
+        <td></td>
+        <td class="right">₱{{ formatMoney(afterAdd()) }}</td>
+      </tr>
 
-<tr class="gross">
-<td class="left"><h3>Gross Income</h3></td>
-<td></td>
-<td class="right">₱{{ gross }}</td>
-</tr>
+      <!-- GROSS -->
+      <tr class="gross">
+        <td><h3>Gross Income</h3></td>
+        <td></td>
+        <td class="right">₱{{ formatMoney(payroll.grossPay) }}</td>
+      </tr>
 
-<tr>
-<td class="left"><h3>Less</h3></td>
-<td class="middle">
-<div>SSS — ₱{{ payroll.deductions.sss }}</div>
-<div>HDMF — ₱{{ payroll.deductions.hdmf }}</div>
-<div>PhilHealth — ₱{{ payroll.deductions.philhealth }}</div>
-<div>Withholding Tax — ₱{{ payroll.deductions.tax }}</div>
-</td>
-<td class="right">₱{{ totalDeduct }}</td>
-</tr>
+      <!-- DEDUCTIONS -->
+      <tr>
+        <td class="left"><h3>Deductions</h3></td>
+        <td class="middle">
+          <div>SSS — ₱{{ formatMoney(payroll.mandatoryDeductions.sssContribution) }}</div>
+          <div>HDMF — ₱{{ formatMoney(payroll.mandatoryDeductions.hdmfContribution) }}</div>
+          <div>PhilHealth — ₱{{ formatMoney(payroll.mandatoryDeductions.philHealthContribution) }}</div>
+          <div>Withholding Tax — ₱{{ formatMoney(payroll.mandatoryDeductions.withholdingTax) }}</div>
+        </td>
+        <td class="right">₱{{ formatMoney(totalDeduct()) }}</td>
+      </tr>
 
-<tr class="net">
-<td class="left"><h3>Net Income</h3></td>
-<td></td>
-<td class="right">₱{{ net }}</td>
-</tr>
+      <!-- NET -->
+      <tr class="net">
+        <td><h3>Net Income</h3></td>
+        <td></td>
+        <td class="right">₱{{ formatMoney(payroll.netPay) }}</td>
+      </tr>
 
-</tbody>
-
-</table>
+    </tbody>
+  </table>
 
 </div>
 </template>
@@ -152,8 +206,6 @@ font-size:13px;
 margin-top:4px;
 }
 
-/* TABLE */
-
 .payroll-table{
 width:100%;
 margin-top:20px;
@@ -168,35 +220,15 @@ border-top:1px solid #1e293b;
 vertical-align:top;
 }
 
-.left{
-width:220px;
-color:#cbd5f5;
-}
+.left{width:220px;color:#cbd5f5;}
+.middle{color:#94a3b8;font-size:13px;line-height:1.6;}
+.right{width:200px;text-align:right;font-weight:600;}
 
-.middle{
-color:#94a3b8;
-font-size:13px;
-line-height:1.6;
-}
-
-.right{
-width:200px;
-text-align:right;
-font-weight:600;
-}
-
-/* HIERARCHY */
-
-h3{
-font-size:14px;
-font-weight:600;
-color:#e5e7eb;
-}
+h3{font-size:14px;font-weight:600;color:#e5e7eb;}
 
 .subtotal td{
 border-top:2px solid #1e293b;
 font-weight:500;
-color:#e5e7eb;
 }
 
 .gross td{
@@ -209,5 +241,10 @@ border-top:3px solid #1d4ed8;
 font-size:16px;
 font-weight:700;
 color:#60a5fa;
+}
+
+.empty, .error{
+margin-top:20px;
+color:#94a3b8;
 }
 </style>

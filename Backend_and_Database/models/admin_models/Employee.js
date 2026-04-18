@@ -6,7 +6,7 @@ const workingDaysSchema = new Schema({
         type: String,
         required: true
     }
-});
+}); 
 
 
 const employeeSchema = new Schema({

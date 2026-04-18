@@ -45,18 +45,14 @@ const handleLogout = () => {
 
       <router-link to="/employeeslist" class="link">
         <Users class="icon" />
-        <span>Employees</span>
+        <span> My Payrolls </span>
       </router-link>
 
       <router-link to="/attendance" class="link">
         <CalendarClock class="icon" />
-        <span>Attendance</span>
+        <span>My Attendance</span>
       </router-link>
 
-      <router-link to="/addemployee" class="link">
-        <Clock class="icon" />
-        <span>Add Employee</span>
-      </router-link>
 
       <router-link to="/notifications" class="link">
         <Bell class="icon" />

@@ -6,63 +6,85 @@ const systemDailyLogschema = new Schema({
         type: Date,
         required: true
     },
+
+    // 🔥 FIXED: allow null when absent
     timeIn: {
         type: Date,
-        required: true
+        default: null
     },
     timeOut: {
         type: Date,
-        required: true
+        default: null
     },
+    breakStart: {
+        type: Date,
+        default: null
+    },
+    breakEnd: {
+        type: Date,
+        default: null
+    },
+
     employee_id: {
         type: Schema.Types.ObjectId,
         ref: 'Employees',
         required: true
     },
+
     employeeName: {
         type: String,
         required: true
     },
-    breakStart: {
-        type: Date,
-        required: true
-    },
-    breakEnd: {
-        type: Date,
-        required: true
-    },
+
     latetime: {
-        type: Boolean, // or number of minutes late ot time
+        type: Number,
+        default: 0
     },
+
     undertime: {
-        type: Boolean, // or number of  minutes or hours or time
+        type: Number,
+        default: 0
     },
+
     overtime: {
-        type: Boolean, //or number of hours or time
+        type: Number,
+        default: 0
     },
 
     absent: {
         type: Boolean,
+        default: false
     },
+
     regularPay: {
         type: Boolean,
+        default: false
     },
+
     holidayPay: {
         type: Boolean,
+        default: false
     },
+
     regularHoliday: {
         type: Boolean,
+        default: false
     },
+
     specialHoliday: {
-        type: Boolean,  
+        type: Boolean,
+        default: false
     },
+
     overtimePay: {
         type: Number,
+        default: 0
     },
+
     daywage: {
         type: Number,
+        default: 0
     }
 });
 
 module.exports = mongoose.model('SystemDailyLog', systemDailyLogschema);
-

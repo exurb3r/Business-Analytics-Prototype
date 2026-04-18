@@ -108,8 +108,8 @@
   import { ref } from "vue";
   import DashboardCharts from "../components/DashboardCharts.vue";
 
-  const adminName = localStorage.getItem("adminCredentials")
-    ? JSON.parse(localStorage.getItem("adminCredentials")).username
+  const adminName = localStorage.getItem("employeeCredentials")
+    ? JSON.parse(localStorage.getItem("employeeCredentials")).username
     : "Admin";
 
   const today = new Date().toLocaleDateString("en-PH", {

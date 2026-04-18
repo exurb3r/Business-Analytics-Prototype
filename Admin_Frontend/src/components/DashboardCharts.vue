@@ -1,43 +1,72 @@
-<template>
-  <div style="display: flex; gap: 1.5rem; padding: 0 0 1.5rem;">
-
-    <!-- Weekly Attendance Bar + Line Chart -->
-    <div style="flex: 2; background: #151c2e; border-radius: 14px; border: 1px solid #1e2d4a; padding: 1.5rem;">
-      <h3 style="color: #e4eaf8; margin: 0 0 1rem; font-size: 14px; font-weight: 600;">Weekly Attendance Overview</h3>
-      <apexchart type="bar" :options="barOptions" :series="barSeries" height="260" />
-    </div>
-
-    <!-- Today's Breakdown Donut -->
-    <div style="flex: 1; background: #151c2e; border-radius: 14px; border: 1px solid #1e2d4a; padding: 1.5rem;">
-      <h3 style="color: #e4eaf8; margin: 0 0 1rem; font-size: 14px; font-weight: 600;">Today's Status Breakdown</h3>
-      <apexchart type="donut" :options="donutOptions" :series="donutSeries" height="260" />
-    </div>
-
-  </div>
-</template>
-
 <script setup>
-/* Weekly bar chart — Log-ins (bar) + Late (line) */
-const barSeries = [
-  { name: "Log-ins",   type: "bar",  data: [82, 91, 85, 87, 79, 44, 21] },
-  { name: "Late",      type: "bar",  data: [10, 7,  11, 14, 13, 6,  2]  },
-  { name: "Absent",    type: "bar",  data: [8,  4,  9,  9,  11, 30, 49] },
-  { name: "Overtime",  type: "line", data: [18, 22, 19, 22, 15, 5,  2]  },
-  { name: "Undertime", type: "line", data: [8,  5,  9,  11, 13, 4,  1]  },
-];
+import { ref, onMounted } from "vue";
 
+/* =========================
+   STATE
+========================= */
+const barSeries = ref([
+  { name: "Log-ins",   type: "bar",  data: [] },
+  { name: "Late",      type: "bar",  data: [] },
+  { name: "Absent",    type: "bar",  data: [] },
+  { name: "Overtime",  type: "line", data: [] },
+  { name: "Undertime", type: "line", data: [] },
+]);
+
+const donutSeries = ref([]);
+
+/* =========================
+   FETCH FROM BACKEND
+========================= */
+const fetchDashboard = async () => {
+  try {
+    const res = await fetch("http://localhost:3500/admins/dashboard", {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("adminToken")}`
+      }
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      console.error(data.message);
+      return;
+    }
+
+    /* 🔥 MAP WEEKLY */
+    barSeries.value[0].data = data.weekly.logins;
+    barSeries.value[1].data = data.weekly.late;
+    barSeries.value[2].data = data.weekly.absent;
+    barSeries.value[3].data = data.weekly.overtime;
+    barSeries.value[4].data = data.weekly.undertime;
+
+    /* 🔥 MAP DONUT */
+    donutSeries.value = [
+      data.today.present,
+      data.today.late,
+      data.today.absent,
+      data.today.overtime,
+      data.today.undertime
+    ];
+
+  } catch (err) {
+    console.error("Dashboard fetch error:", err);
+  }
+};
+
+onMounted(fetchDashboard);
+
+/* =========================
+   OPTIONS
+========================= */
 const barOptions = {
   chart: {
     background: "transparent",
     toolbar: { show: false },
-    stacked: false,
   },
   colors: ["#1e6bff", "#e8a020", "#f04040", "#1dbf8f", "#a855f7"],
   xaxis: {
-    categories: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+    categories: ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"], // 🔥 MATCH BACKEND
     labels: { style: { colors: "#6b80a8", fontSize: "12px" } },
-    axisBorder: { color: "#1e2d4a" },
-    axisTicks: { color: "#1e2d4a" },
   },
   yaxis: [
     {
@@ -63,8 +92,6 @@ const barOptions = {
   dataLabels: { enabled: false },
 };
 
-/* Donut — today's statuses */
-const donutSeries = [87, 14, 9, 22, 11];
 const donutOptions = {
   labels: ["Present", "Late", "Absent", "Overtime", "Undertime"],
   colors: ["#1e6bff", "#e8a020", "#f04040", "#1dbf8f", "#a855f7"],
@@ -82,13 +109,8 @@ const donutOptions = {
             show: true,
             label: "Total",
             color: "#c5d4f0",
-            fontSize: "13px",
-            formatter: () => "143"
-          },
-          value: {
-            color: "#ffffff",
-            fontSize: "22px",
-            fontWeight: "700",
+            formatter: () =>
+              donutSeries.value.reduce((a, b) => a + b, 0) // 🔥 dynamic total
           }
         }
       }
@@ -96,3 +118,67 @@ const donutOptions = {
   }
 };
 </script>
+
+<template>
+  <div class="charts-wrap">
+
+    <!-- BAR + LINE -->
+    <div class="card large">
+      <h3>Weekly Attendance Overview</h3>
+      <apexchart
+        type="bar"
+        :options="barOptions"
+        :series="barSeries"
+        height="260"
+      />
+    </div>
+
+    <!-- DONUT -->
+    <div class="card small">
+      <h3>Today's Status Breakdown</h3>
+      <apexchart
+        type="donut"
+        :options="donutOptions"
+        :series="donutSeries"
+        height="260"
+      />
+    </div>
+
+  </div>
+</template>
+
+<style scoped>
+.charts-wrap {
+  display: flex;
+  gap: 1.5rem;
+  padding-bottom: 1.5rem;
+}
+
+/* CARDS */
+.card {
+  background: #151c2e;
+  border-radius: 14px;
+  border: 1px solid #1e2d4a;
+  padding: 1.5rem;
+  transition: 0.2s;
+}
+
+.card:hover {
+  border-color: #3b82f6;
+}
+
+.card.large {
+  flex: 2;
+}
+
+.card.small {
+  flex: 1;
+}
+
+h3 {
+  color: #e4eaf8;
+  margin-bottom: 1rem;
+  font-size: 14px;
+  font-weight: 600;
+}
+</style>

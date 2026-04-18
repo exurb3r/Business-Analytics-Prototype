@@ -7,22 +7,10 @@ const employeeDailyLogSubschema = new Schema({
         type: Date,
         required: true
     },
-    timeIn: {
-        type: Date,
-        required: true
-    },
-    timeOut: {
-        type: Date,
-        required: true
-    },
-    breakStart: {
-        type: Date,
-        required: true
-    },
-    breakEnd: {
-        type: Date,
-        required: true
-    },
+    timeIn: { type: Date },
+    timeOut: { type: Date },
+    breakStart: { type: Date },
+    breakEnd: { type: Date },
     latetime: {
         type: Number, // or number of minutes late
     },

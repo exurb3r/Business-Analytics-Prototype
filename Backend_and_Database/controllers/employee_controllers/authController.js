@@ -1,84 +1,58 @@
-const User = require('../../models/admin_models/Users');
-const AppUser = require('../../models/user_models/AppUsers');
-const UserProgress = require('../../models/user_models/UserProgress');
-const UserPrefAndMisc = require('../../models/user_models/UserPreferenceAndMisc');
-const UserGameDetails = require('../../models/user_models/UserGameDetails');
-const UserSocial = require('../../models/user_models/UserSocial');
-const Task = require('../../models/user_models/UserNotes');
-
+const Employee = require('../../models/admin_models/Employee'); // FIXED
 const bcrypt = require('bcrypt');
 const jwt = require("jsonwebtoken");
 
 const login = async (req, res) => {
-    try{
+    try {
         const { email, password } = req.body;
-        if (!email || !password) return res.status(400).json({message: "Email and Password are required"});
-        
-        const userFound = await AppUser.findOne({email});
-        if (!userFound) return res.status(401).json({'message': 'User does not exists'});
 
-        const match = await bcrypt.compare(password, userFound.password);
-        if (!match) return res.status(401).json({'message': 'Invalid Password'});
+        // Validate input
+        if (!email || !password) {
+            return res.status(400).json({ message: "Email and Password are required" });
+        }
 
+        // Find employee
+        const employee = await Employee.findOne({ email });
+        if (!employee) {
+            return res.status(401).json({ message: "User does not exist" });
+        }
+
+        // Compare password
+        const match = await bcrypt.compare(password, employee.password);
+        if (!match) {
+            return res.status(401).json({ message: "Invalid password" });
+        }
+
+        // Check secret
+        if (!process.env.ACCESS_TOKEN_SECRET) {
+            return res.status(500).json({ message: "Server config error" });
+        }
+
+        // Generate token
         const token = jwt.sign(
-            { id: userFound._id, role: userFound.role },
+            { id: employee._id, role: employee.role },
             process.env.ACCESS_TOKEN_SECRET,
             { expiresIn: "1h" }
         );
 
+        // Send response
         res.json({
             token,
             user: {
-                userId: userFound.userId,
-                username: userFound.username,
-                email: userFound.email,
-                role: userFound.role
-            } 
-        }
-        );
-
-    } catch (err) {
-        res.status(500).json({ message: err.message});
-    }
-}
-
-const signup = async(req, res) => {
-    try{
-        const {username, email, password} = req.body;    
-        if(!username ||!email || !password) return res.status(400).json({message: "All credentials are required"});
-        const newUser = await AppUser.findOne({email});
-
-        if(newUser) return res.status(400).json({message: "Email is already in use"});
-
-        const registeredUser = await User.findOne({email});
-        if (!registeredUser) return res.status(400).json({message: "No corresponding user found in the system. Please contact support."});
-
-
-
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-        const addNewUser = await AppUser.create({
-            _id: registeredUser._id,
-            userId: registeredUser._id,
-            username: username,
-            email: email,
-            password: hashedPassword,
-            role: 452,
-            joinDate: new Date()
-        });
-
-        res.status(200).json({
-            user: {
-                id: addNewUser._id,
-                username: addNewUser.username,
-                email: addNewUser.email
+                id: employee._id, // FIXED
+                username: employee.username,
+                email: employee.email,
+                role: employee.role,
+                firstname: employee.firstname,
+                lastname: employee.lastname,
+                position: employee.position
             }
         });
 
     } catch (err) {
-        res.status(500).json({ message: err.message});
         console.error(err);
+        res.status(500).json({ message: "Server error" });
     }
-}
+};
 
-module.exports = {login, signup};
+module.exports = { login };

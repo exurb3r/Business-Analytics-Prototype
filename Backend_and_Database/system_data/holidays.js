@@ -1,4 +1,4 @@
-// holiday list
+
 const holidays = {
   "2026-01-01": { name: "New Year's Day", type: "regular", multiplier: 2 },
   "2026-04-02": { name: "Maundy Thursday", type: "regular", multiplier: 2 },

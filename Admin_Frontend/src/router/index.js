@@ -11,6 +11,10 @@ import Attendance from '../views/Attendance.vue'
 import EmployeeList from '../views/EmployeesList.vue'
 import PayrollView from '../views/PayrollView.vue'
 import AddEmployee from '../views/AddEmployee.vue'
+import TestData from '../views/TestData.vue'
+import Middlepage from '../views/Middlepage.vue'
+import EditEmployee from '../views/EditEmployee.vue'
+import Calendar from '../views/Calendar.vue'
 
 const routes = [
   // ✅ LOGIN (NO SIDEBAR)
@@ -31,9 +35,13 @@ const routes = [
       { path: 'settings', name: 'Settings', component: Settings },
       { path: 'attendance', name: 'Attendance', component: Attendance },
       { path: 'employeeslist', name: 'Employee List', component: EmployeeList},
-      { path: 'payroll/:id', name: 'Payroll', component: PayrollView },
-      { path: 'addemployee', name: 'Add Employee', component: AddEmployee }
-
+      { path: 'payroll/:email', name: 'Payroll', component: PayrollView },
+      { path: 'addemployee', name: 'Add Employee', component: AddEmployee },
+      { path: 'testdata', name: 'Test Data', component: TestData},
+      { path: "/employee/:email/payrolls", name: "middlepage", component: Middlepage},
+      { path: '/editemployee/:email', name: 'EditEmployee', component: EditEmployee },
+      { path: '/calendar', name: 'Calendar', component: Calendar}
+      
     ]
   }
 ]

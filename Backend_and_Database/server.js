@@ -12,7 +12,8 @@ connectDB();
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use('/admins', require('./routes/admins'));
-//app.use('/users', require('./routes/users'));
+app.use('/employees', require('./routes/employee'));
+app.use('/test', require('./routes/test'));
 //app.use('/system', require('./routes/system'));
 
 mongoose.connection.once('open', () => {

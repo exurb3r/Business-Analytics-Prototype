@@ -24,10 +24,12 @@ const handleLogout = () => {
 
     <!-- LOGO -->
     <div class="logo">
-      <div class="logo-box">B</div>
-      <div>
-        <p class="brand">Hotdog ni MD</p>
-        <span class="sub">Admin Controls</span>
+      <div class="logo-box">
+        <BarChart3 class="logo-icon" />
+      </div>
+      <div class="logo-text">
+        <p class="brand">DCCP Payroll</p>
+        <span class="sub">Admin Panel</span>
       </div>
     </div>
 
@@ -53,26 +55,23 @@ const handleLogout = () => {
         <span>Attendance</span>
       </router-link>
 
+      <!-- 🔥 FIXED ICON -->
       <router-link to="/addemployee" class="link">
-        <Clock class="icon" />
+        <Users class="icon" />
         <span>Add Employee</span>
       </router-link>
 
-      <router-link to="/notifications" class="link">
-        <Bell class="icon" />
-        <span>Notifications</span>
+      <!-- 🔥 BETTER ICON -->
+      <router-link to="/calendar" class="link">
+        <Clock class="icon" />
+        <span>Calendar</span>
       </router-link>
 
       <p class="section">OTHER</p>
 
-      <router-link to="/reports" class="link">
+      <router-link to="/testdata" class="link">
         <BarChart3 class="icon" />
-        <span>Reports</span>
-      </router-link>
-
-      <router-link to="/settings" class="link">
-        <Settings class="icon" />
-        <span>Settings</span>
+        <span>Test Data</span>
       </router-link>
 
     </nav>
@@ -96,32 +95,56 @@ const handleLogout = () => {
   background: linear-gradient(180deg, #0a0d14, #0f1421);
   border-right: 1px solid #1e2d4a;
 }
-
-/* LOGO */
+/* LOGO IMPROVED */
 .logo {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 26px;
+  gap: 12px;
+  margin-bottom: 28px;
 }
+
 .logo-box {
-  width: 34px;
-  height: 34px;
-  border-radius: 9px;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
   background: linear-gradient(135deg, #1e6bff, #0a3fa8);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
-  font-weight: bold;
+  box-shadow: 0 0 12px rgba(30,107,255,.35);
+}
+
+.logo-icon {
+  width: 18px;
+  height: 18px;
   color: white;
 }
+
+.logo-text {
+  display: flex;
+  flex-direction: column;
+}
+
 .brand {
-  color: white;
+  color: #e4eaf8;
   font-weight: 700;
   font-size: 14px;
   margin: 0;
 }
+
+.sub {
+  font-size: 10px;
+  color: #6b80a8;
+  letter-spacing: .4px;
+}
+
+.brand {
+  color: #e4eaf8;
+  font-weight: 700;
+  font-size: 14px;
+  margin: 0;
+}
+
 .sub {
   font-size: 10px;
   color: #6b80a8;
@@ -133,83 +156,108 @@ const handleLogout = () => {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 4px;
   overflow-y: auto;
   padding-right: 2px;
 }
-.nav::-webkit-scrollbar        { width: 4px; }
-.nav::-webkit-scrollbar-track  { background: transparent; }
-.nav::-webkit-scrollbar-thumb  { background: transparent; border-radius: 10px; }
-.nav:hover::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); }
-.nav { scrollbar-width: thin; scrollbar-color: transparent transparent; }
-.nav:hover { scrollbar-color: rgba(255,255,255,.1) transparent; }
 
 /* SECTION LABEL */
 .section {
   font-size: 9px;
   color: #3d5278;
   margin-top: 16px;
-  margin-bottom: 4px;
-  letter-spacing: 1.2px;
+  margin-bottom: 6px;
+  letter-spacing: 1.3px;
   padding-left: 10px;
 }
 
-/* LINK */
+/* LINKS */
 .link {
   display: flex;
   align-items: center;
-  gap: 9px;
-  padding: 8px 10px;
-  border-radius: 9px;
+  gap: 10px;
+  padding: 9px 11px;
+  border-radius: 10px;
   color: #6b80a8;
   text-decoration: none;
   font-size: 13px;
   position: relative;
-  transition: all .15s ease;
+  transition: all .18s ease;
 }
+
+/* ICON */
 .icon {
-  width: 15px;
-  height: 15px;
-  opacity: .8;
+  width: 16px;
+  height: 16px;
+  opacity: .75;
+  transition: 0.2s;
 }
+
+/* HOVER */
 .link:hover {
-  background: rgba(255,255,255,.04);
+  background: rgba(255,255,255,.05);
   color: #c5d4f0;
+  transform: translateX(3px);
 }
+
+.link:hover .icon {
+  opacity: 1;
+}
+
+/* ACTIVE */
 .link.router-link-exact-active {
-  background: rgba(30,107,255,.15);
+  background: linear-gradient(90deg, rgba(30,107,255,.25), rgba(30,107,255,.05));
   color: #5b9aff;
   font-weight: 500;
+  box-shadow: inset 0 0 8px rgba(30,107,255,.15);
 }
+
+.link.router-link-exact-active .icon {
+  opacity: 1;
+}
+
+/* LEFT BAR INDICATOR */
 .link.router-link-exact-active::before {
   content: "";
   position: absolute;
-  left: -4px;
-  height: 50%;
+  left: -6px;
+  height: 60%;
   width: 3px;
   background: #1e6bff;
   border-radius: 4px;
+  box-shadow: 0 0 6px #1e6bff;
 }
 
-/* LOGOUT */
+/* SCROLLBAR */
+.nav::-webkit-scrollbar {
+  width: 4px;
+}
+.nav::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,.08);
+  border-radius: 10px;
+}
+
+/* LOGOUT (🔥 IMPROVED) */
 .logout {
-  margin-top: 10px;
+  margin-top: auto; /* stick bottom */
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 9px;
-  border-radius: 9px;
+  padding: 10px;
+  border-radius: 10px;
   border: 1px solid #1e2d4a;
-  background: transparent;
+  background: rgba(255,255,255,0.02);
   color: #6b80a8;
   font-size: 13px;
   cursor: pointer;
-  transition: .15s;
+  transition: all .2s ease;
 }
+
 .logout:hover {
-  background: rgba(30,107,255,.08);
-  color: #5b9aff;
-  border-color: #1e6bff;
+  background: rgba(239,68,68,.08);
+  color: #ef4444;
+  border-color: #ef4444;
+  transform: translateY(-1px);
 }
 </style>

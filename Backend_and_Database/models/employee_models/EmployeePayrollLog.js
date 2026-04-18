@@ -1,107 +1,37 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-
 const lessPaySubschema = new Schema({
-    absent: {
-        type: Number
-    }, // number of days absent
-    absentDeduction: {
-        type: Number
-    }, // amount to be deducted for absences
-    late: {
-        type: Number
-    }, // number of minutes late
-    lateDeduction: {
-        type: Number
-    }, // amount to be deducted for being late
-    undertime: {
-        type: Number
-    }, // number of minutes undertime
-    undertimeDeduction: {
-        type: Number
-    }, // amount to be deducted for undertime
-    otherDeductionsDescription: {
-        type: String
-    }, // description of any other deductions
-    otherDeductions: {
-        type: Number
-    }, // any other deductions
-    
+    late: { type: Number, default: 0 },
+    undertime: { type: Number, default: 0 },
+    absent: { type: Number, default: 0 },
+    damages: { type: Number, default: 0 },
+    advancements: { type: Number, default: 0 },
 
+    lateDeduction: { type: Number, default: 0 },
+    undertimeDeduction: { type: Number, default: 0 },
+    absentDeduction: { type: Number, default: 0 }
 });
 
 const addPaySubschema = new Schema({
-    overtimeHours: {
-        type: Number
-    }, // number of overtime hours
-    overtimePay: {
-        type: Number
-    }, // amount to be added for overtime
-    overtimeRegHolidayHours: {
-        type: Number
-    }, // number of overtime hours on regular holidays
-    overtimeRegHolidayPay: {
-        type: Number
-    }, // amount to be added for overtime on regular holidays
+    overtimeHours: { type: Number, default: 0 },
+    overtimePay: { type: Number, default: 0 },
 
-    overtimeHoursSpecialHoliday: {
-        type: Number
-    }, // number of overtime hours on special holidays
-    overtimeSpecialHolidayPay: {
-        type: Number
-    }, // amount to be added for overtime on special holidays
+    regularHolidayPay: { type: Number, default: 0 },
+    specialHolidayPay: { type: Number, default: 0 },
 
+    nightDifferentialHours: { type: Number, default: 0 },
+    nightDifferentialPay: { type: Number, default: 0 },
 
-
-    regularHoliday: {
-        type: Number
-    }, // amount to be added for regular holidays
-    regularHolidayPay: {
-        type: Number
-    }, // amount to be added for regular holiday pay
-    specialHoliday: {
-        type: Number
-    }, // amount to be added for special holidays
-    specialHolidayPay: {
-        type: Number
-    }, // amount to be added for special holiday pay
-    sickLeave: {
-        type: Number
-    }, // number of sick leave days
-    sickLeavePay: {
-        type: Number
-    }, // amount to be added for sick leave
-    nightDifferentialHours: {
-        type: Number
-    }, // number of night differential hours
-    nightDifferentialPay: {
-        type: Number
-    }, // amount to be added for night differential
-
-    otheradditionsDescription: {
-        type: String
-    }, // description of any other additions
-    otherAdditions: {
-        type: Number
-    }, // any other additions
+    otherAdditions: { type: Number, default: 0 }
 });
 
 const mandatoryDeductionsSubschema = new Schema({
-    sssContribution: {
-        type: Number
-    },
-    philHealthContribution: {
-        type: Number
-    },
-    HDMFContribution: {
-        type: Number
-    },
-    withholdingTax: {
-        type: Number
-    }
+    sssContribution: { type: Number, default: 0 },
+    philHealthContribution: { type: Number, default: 0 },
+    hdmfContribution: { type: Number, default: 0 },
+    withholdingTax: { type: Number, default: 0 }
 });
-
 
 
 const employeeDailyLogSubschema = new Schema({
@@ -131,18 +61,31 @@ const employeeDailyLogSubschema = new Schema({
 });
 
 
-
-
 const employeePayrollLogSchema = new Schema({
-    _id: {
+    employeeId: {
         type: Schema.Types.ObjectId,
-        ref: 'Employees',   
+        ref: 'Employees',
+        required: true
     },
+
     email: {
         type: String,
         required: true
     },
-    employeePayrollLog : [employeeDailyLogSubschema]
+    
+    month: {
+        type: String,
+        required: true
+    },
+
+    lessPay: { type: lessPaySubschema, default: () => ({}) },
+    addPay: { type: addPaySubschema, default: () => ({}) },
+    mandatoryDeductions: { type: mandatoryDeductionsSubschema, default: () => ({}) },
+
+    basicPay: { type: Number, required: true },
+
+    grossPay: { type: Number, default: 0 },
+    netPay: { type: Number, default: 0 }
 });
 
 module.exports = mongoose.model('EmployeePayrollLog', employeePayrollLogSchema);

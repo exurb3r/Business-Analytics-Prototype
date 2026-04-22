@@ -77,6 +77,7 @@ const addData = async (req, res) => {
             if (holiday.type === 'regular') specification = 'regular holiday';
             else if (holiday.type === 'special_non_working') specification = 'special holiday';
             else if (holiday.type === 'special_day') specification = 'special working holiday';
+    
 
         } else {
             const dayName = new Date(date).toLocaleDateString('en-US', { weekday: 'long' });
